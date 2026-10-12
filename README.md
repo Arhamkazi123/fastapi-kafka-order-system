@@ -1,6 +1,5 @@
 # Order System — FastAPI + Kafka + SQLite
 
-A real-time order processing system built to learn Kafka in a production-like context.
 Orders flow from an HTTP API through Kafka to independent worker services — asynchronously,
 with retry logic, dead letter queue, and fan-out consumer groups.
 
@@ -226,13 +225,3 @@ Watch `order_worker` retry 3 times then send to DLQ. Then:
 GET /admin/dlq                          → see the failed order
 POST /admin/dlq/{order_id}/replay       → reprocess it
 ```
-
----
-
-## Known Limitations (learning project)
-
-- **SQLite** — single file DB, not suitable for multi-process writes at scale. Use PostgreSQL in production.
-- **In-memory analytics** — `analytics_worker` stats reset on restart. Persist to DB in production.
-- **Dual-write risk** — DB write and Kafka produce are not atomic. A crash between the two can cause a duplicate email. Fix with idempotency checks or Kafka transactions.
-- **Single partition** — all topics have 1 partition. Scale by creating topics explicitly with 3+ partitions.
-- **No auth on admin routes** — any logged-in user can view/replay DLQ. Add admin role check in production.
